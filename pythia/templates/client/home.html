@@ -1,0 +1,41 @@
+{% extends 'base_client.html' %}
+
+{% block title %}Home{% endblock %}
+
+
+{% block header %}
+<h1>Client: Home</h1>
+{% endblock %}
+
+{% block content %}
+{% if g.username %}
+    <p>Client Welcome Home Note</p>
+    <div class="ProjectList">
+        <p>Active Project Links:</p>
+        {% if not active_id %}
+            <h3>No Active Projects</h3>
+        {% endif %}
+        {% for id in active_id %}
+            <li style="margin-left: 20px;">
+                <a href="{{ url_for('client.project', id=id[0]) }}">Projec No. {{id[0]}}</a>: {{id[1]}}
+                <a href="{{ url_for('client.ret_project_csv', id = id[0])}}">(Export CSV)</a>
+                <a href="{{ url_for('client.ret_project_json', id = id[0])}}">(Export JSON)</a>
+            </li>
+        {% endfor %}
+
+        <p>Past Project Links:</p>
+        {% if not past_id %}
+            <h3>No Past Projects</h3>
+        {% endif %}
+        {% for id in past_id %}
+            <li style="margin-left: 20px;">
+                <a href="{{ url_for('client.project', id=id[0]) }}">Projec No. {{id[0]}}</a>: {{id[1]}}
+                <a href="{{ url_for('client.ret_project_csv', id = id[0])}}">(Export CSV)</a>
+                <a href="{{ url_for('client.ret_project_json', id = id[0])}}">(Export JSON)</a>
+            </li>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Something Wrong!</p>
+{% endif %}
+{% endblock %}

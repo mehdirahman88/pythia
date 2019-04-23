@@ -1,0 +1,19 @@
+{% extends 'base_annotator.html' %}
+
+{% block title %}Home{% endblock %}
+
+
+{% block header %}
+<h1>Annotator: Home</h1>
+{% endblock %}
+
+{% block content %}
+{% if g.username %}
+    <h2>Error Page</h2>
+    {% if msg %}
+        <p>{{msg}}</p>
+    {% endif %}
+{% else %}
+    <p>Something Wrong!</p>
+{% endif %}
+{% endblock %}

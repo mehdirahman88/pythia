@@ -1,0 +1,32 @@
+<!doctype html>
+<title>Pythia| {% block title %}{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <h1></h1>
+  <ul>
+    {% if g.username %}
+        {% if g.usertype == 'Annotator'%}
+            <li><a href="{{ url_for('annotator.home') }}">Home</a>
+        {% else %}
+            <li><a href="{{ url_for('client.home') }}">Home</a>
+        {% endif %}
+        <li><a href="{{ url_for('auth.signout') }}">Sign Out</a>
+    {% else %}
+        <li><a href="{{ url_for('hello') }}">Home</a>
+        <li><a href="{{ url_for('auth.signup') }}">Sign Up</a>
+        <li><a href="{{ url_for('auth.signin') }}">Sign In</a>
+    {% endif %}
+  </ul>
+</nav>
+
+<section class="content">
+  <header>
+    {% block header %}{% endblock %}
+  </header>
+
+  {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% block content %}{% endblock %}
+</section>

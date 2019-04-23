@@ -1,0 +1,27 @@
+{% extends 'base_annotator.html' %}
+
+{% block title %}Home{% endblock %}
+
+
+{% block header %}
+<h1>Annotator: Home</h1>
+{% endblock %}
+
+{% block content %}
+{% if g.username %}
+    <p>Annotator Welcome Home Note</p>
+    <div class="ProjectList">
+        <h3>Active Project Links:</h3>
+        {% for id in active_id %}
+            <li style="margin-left: 20px;">
+                <a href="{{ url_for('annotator.project', id=id['project_id']) }}">Projec No. {{id['project_id']}}</a>: {{id['title']}}
+            </li>
+        {% endfor %}
+
+        <h3>Past Project Links:</h3>
+        <p>Not Available</p>
+    </div>
+{% else %}
+    <p>Something Wrong!</p>
+{% endif %}
+{% endblock %}

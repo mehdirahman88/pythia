@@ -1,0 +1,16 @@
+{% extends 'base_annotator.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+
+{% block header %}
+<h1>Annotator: Dashboard</h1>
+{% endblock %}
+
+{% block content %}
+{% if g.username %}
+    <p>Annotator Dashboard Note</p>
+{% else %}
+    <p>Something Wrong!</p>
+{% endif %}
+{% endblock %}
