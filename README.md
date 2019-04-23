@@ -1,34 +1,43 @@
-# README Pythia
+# README Pythia {ignore=true}
 
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-* [README Pythia](#readme-pythia)
-	* [Landing Words](#landing-words)
-	* [Features](#features)
-	* [Overview](#overview)
-	* [Guideline](#guideline)
-	* [Future Plans](#future-plans)
-	* [Contributors](#contributors)
+* [Landing Words](#landing-words)
+* [Features](#features)
+* [Overview](#overview)
+* [Guideline](#guideline)
+* [Future Steps](#future-steps)
+* [Contributors](#contributors)
 
 <!-- /code_chunk_output -->
 
 ## Landing Words
- **Pythia** is a web application primarily developed as an initiative for helping research students to build _Labeled Dataset_ by bare minimum effort, and yet with reliability.
-## Features
- - Text To Text Labeling
- - Assign Multiple Annotators for Parallel Annotation
- - View Project Progress Status
- - Pause A Running Project
-## Overview
- **Pythia** is very simple to use. You just upload your sample data file of size up to 50 Mb and list of label in the format specified, assign up to 10 annotators and run the project.
+ **Pythia** is a web application primarily developed as an initiative for helping researchers to build _Labeled Dataset_ from crowd in a organized way, with minimal effort, and yet with reliability.
 
- Annotators will find 5 unlabeled data from _Pythia Dispatcher_ each time they hit the project page ready for labeling. **Dispatcher** will receive those annotated data and assign new set of data to the Annotator. No Annotator will receive the same data twice.
+## Features
+ - Text to text labeling
+ - Allow multiple annotators for simultaneous Annotation
+ - View project progress status
+ - Pause and resume running project
+
+## Overview
+ **Pythia** is very simple to use. You just upload your sample data file of size up to 50 Mb and list of labels in the format specified, then assign up to 10 annotators and run the project.
+
+ Annotators will find 5 unlabeled data from _Pythia Dispatcher_ each time they hit the project page ready for labeling. **Dispatcher** will receive those annotated data and assign new set of data to the Annotator. No Annotator will receive already annotated data.
 <!-- ### What It Is? -->
 <!-- ### How It Works? -->
 <!-- ## Tutorial -->
 ## Guideline
+ - **Running Server and Database Setup**
+	 - `export FLASK_APP=pythia`
+	 - `flask init-db`
+	 - `flask run --host 0.0.0.0 --port 5000`
+	 - Please refer to: [Flask Quickstart](http://flask.pocoo.org/docs/1.0/quickstart/)
+ - **Deployment**
+	 - The app currently uses the built-in flask server. You may dockerize the app as it is. Please refer to the given `Dockerfile`.
+	 - Further: [Deployment Options](flask.pocoo.org/docs/1.0/deploying/)
  - **Client**
      - Sign Up as Client
      - Create New Project
@@ -38,13 +47,14 @@
      - Start Project
  - **Annotator**
      - Sign Up as Annotator
-     - In the home page there will be running project list
+     - View running project list in the home page
          - Click on the link
          - Label the samples
-         - Submit, and the page will refresh with new data
-## Future Plans
+         - Submit, then the page will refresh with new data
+
+## Future Steps
  - **Next Steps**:
-     - Multi Label Annotation
+     - Multi-label Annotation
      - View progress status in more details:
          - Annotator progress
          - Annotation speed curve.
@@ -53,9 +63,9 @@
          - Extend project after time out
          - Message broadcast to annotators.
  - **Next Next Steps**:
-     - Active Learning
-     - Administrative Dashboard
-     - Annotator Ranking
+     - Active learning
+     - Administrative dashboard
+     - Annotator ranking
      - Faster Dispatcher
 ## Contributors
 Mehdi Rahman
