@@ -11,7 +11,7 @@ from flask import current_app as app
 from pythia.db import get_db, init_db
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-### Strictly Testing
+
 @bp.before_app_request
 def load_user():
     username = session.get('username')
@@ -26,7 +26,7 @@ def load_user():
         g.userid = userid
     if usertype is not None:
         g.usertype = usertype
-    
+
 
 ### Used Accross Modules
 def login_required(view):
@@ -83,8 +83,8 @@ def login_auth_required(view):
             return redirect(url_for('auth.signin'))
         return view(*nargs, **kwargs)
     return wrapped_view
-### Routes of Auth Module
 
+### Routes of Auth Module
 @bp.route('/signup', methods=('GET', 'POST'))
 def signup():
     if request.method == 'POST':
@@ -174,8 +174,84 @@ def signin():
         flash(msg)
     return render_template('auth/signin.html')
 
+# Utilities
+@login_auth_required # Note: Not necessary?
+def get_progress(id):
+    '''
+    Computes Progress of A Project
 
-### Routes For TESTING
+    Parameters:
+    id - Project Id
+
+    Returns:
+    Progress(No. of Rows Annotated) of The Project
+    '''
+    ans = 0
+    db = get_db()
+    try:
+        with db:
+            ans = db.execute(
+                'SELECT COUNT(*) from "contents"'
+                '   WHERE "project_id" = ? and "status" = ?;',
+                (id, "Annotated")
+            ).fetchone()[0]
+    except:
+        ans = 9999999
+    return ans
+
+def get_table_size(tname):
+    db = get_db()
+
+    # Problematic? using {}
+    try:
+        x = db.execute('SELECT MAX(rowid) AS mxid FROM {}'.format(tname)).fetchone()
+    except:
+        return 0
+
+    sz_projects = 0
+    if x['mxid'] is not None:
+        sz_projects = x['mxid']
+    return sz_projects
+
+def get_current_date_time(db):
+    return db.execute("SELECT datetime('now')").fetchone()[0]
+
+def get_json_from_table(x):
+    '''
+    Converts sqlite3 Table To JSON
+
+    Parameters:
+    -----------
+    x - List of sqlite3 Row Objects
+
+
+    Returns:
+    --------
+    Empty List - If len(x) == 0
+
+    List Of JSON - When 'x' is a valid sqlite3 Row List, i.e. 'x[0].keys()' exists
+
+    x (The Parameter Object Itself) - If 'x[0].keys()' does not exist
+
+    '''
+
+    if len(x) == 0:
+        return []
+    try:
+        keys = x[0].keys()
+    except:
+        return x
+
+    resps = []
+    for row in x:
+        resp = {}
+        for key in keys:
+            resp[key] = row[key]
+        resps.append(resp)
+    return resps
+
+
+# Some Routes for testing
 @bp.route('/test', methods=('GET', 'POST'))
 def test():
 
@@ -201,48 +277,6 @@ def test():
 
     return jsonify(xx)
     return render_template('auth/signin.html')
-
-
-# Utilities
-@login_auth_required # Note: Not necessary
-def get_progress(id):
-    '''
-    Computes Progress of A Project
-
-    Parameters:
-    id - Project Id
-
-    Returns:
-    Progress(No. of Rows Annotated) of The Project
-    '''
-    ans = 0
-    db = get_db()
-    try:
-        with db:
-            ans = db.execute(
-                'SELECT COUNT(*) from "contents"'
-                '   WHERE "project_id" = ? and "status" = ?;',
-                (id, "Annotated")
-            ).fetchone()[0]
-    except:
-        ans = 9999999
-    return ans
-def get_table_size(tname):
-    db = get_db()
-
-    # Problematic? using {}
-    try:
-        x = db.execute('SELECT MAX(rowid) AS mxid FROM {}'.format(tname)).fetchone()
-    except:
-        return 0
-
-    sz_projects = 0
-    if x['mxid'] is not None:
-        sz_projects = x['mxid']
-    return sz_projects
-
-def get_current_date_time(db):
-    return db.execute("SELECT datetime('now')").fetchone()[0]
 
 @bp.route('/populate_db', methods=('GET', 'POST'))
 def populate_db():
@@ -469,40 +503,6 @@ def edit(x):
         resps.append(resp)
     return resps
 
-### write help code
-def get_json_from_table(x):
-    '''
-    Converts sqlite3 Table To JSON
-
-    Parameters:
-    -----------
-    x - List of sqlite3 Row Objects
-
-
-    Returns:
-    --------
-    Empty List - If len(x) == 0
-
-    List Of JSON - When 'x' is a valid sqlite3 Row List, i.e. 'x[0].keys()' exists
-
-    x (The Parameter Object Itself) - If 'x[0].keys()' does not exist
-
-    '''
-
-    if len(x) == 0:
-        return []
-    try:
-        keys = x[0].keys()
-    except:
-        return x
-
-    resps = []
-    for row in x:
-        resp = {}
-        for key in keys:
-            resp[key] = row[key]
-        resps.append(resp)
-    return resps
 @bp.route('/show_db', methods=('GET', 'POST'))
 def show_db():
     table = []

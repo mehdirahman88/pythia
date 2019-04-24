@@ -29,10 +29,9 @@ def home():
     cur_date_time = get_current_date_time(db)
 
     rows = []
-    rows = ["Helloo"]
+    # rows = ["Helloo"]
     # Get active projects for the user (annotator)
     try:
-        rows = rows
         rows = db.execute(
             'SELECT contributors.project_id, projects.title'
             '   FROM contributors'
@@ -64,7 +63,6 @@ def pre_actions(view):
             return e.args[0]
         if row == None:
             msg = "Weird! Project No. {} Not Found in DB".format(id)
-            # return msg #Edit Here
             return render_template('annotator/error.html', msg = msg)
 
         if row['status'] != 'Running':
@@ -126,11 +124,11 @@ def project(id):
         label_list = []
         # for label in row['label_list']:
         labels = row['label_list'].split(" ")
-        # return jsonify(labels) #test
+        # return jsonify(labels) # test
         for label in labels:
             label_list.append(label)
 
-
+        # test
         # return render_template('annotator/project.html', project_id=id, \
         # max_annotation = 2, sample_list = ['sample1', 'sample2', 'sample3'], \
         # label_list = ['label1', 'label2', 'label3', 'label4', 'label5', 'label6'], desc = "The quick brown fox")
@@ -150,5 +148,6 @@ def project(id):
         # Content Ids are return in this fashion from the view
         # content_ids = list(myform.keys())
         sz_success = push_data(data)
+
         flash("Success In {} Annotations.".format(sz_success))
         return redirect(url_for('annotator.project', id = id))

@@ -88,17 +88,13 @@ def home():
         ).fetchall()
     except sqlite3.Error as e:
         return e.args[0]
-    # active_id = [row['id'] for row in rows and row['due_date_time'] > cur_date_time]
-    # past_id = [row['id'] for row in rows and row['due_date_time'] <= cur_date_time]
-    # Note: Update and send active_id as dictionary, like in annotator module
+
     for row in rows:
         if row['due_date_time'] > cur_date_time:
             active_id.append((row['id'], row['title']))
         else:
             past_id.append((row['id'], row['title']))
-    # active_id = [row['id'] for row in rows]
-    # active_id.append(cur_date_time)
-    # return jsonify(active_id)
+
     return render_template('client/home.html', active_id = active_id, past_id = past_id)
 
 @bp.route('/createnew', methods=('GET', 'POST'))
