@@ -7,9 +7,9 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        FILE_DIR='./Files/',
-        FILE_DIR_ABS=os.path.join(app.root_path, '../Files/'),
-        DATABASE='./Files/'+'pythia.sqlite', #os.path.join(app.instance_path, 'testappdb1.sqlite'),
+        FILE_DIR='./files/',
+        FILE_DIR_ABS=os.path.join(app.root_path, '../files/'),
+        DATABASE='./files/'+'pythia.sqlite', #os.path.join(app.instance_path, 'testappdb1.sqlite'),
         DEBUG_VIEWS = False,
     )
 
@@ -28,9 +28,7 @@ def create_app(test_config=None):
     #     pass
 
     # a simple page that says hello
-    @app.route('/')
-    def hello():
-        return render_template('home.html');
+
 
     # My: Initiating DB
     from . import db
@@ -55,6 +53,9 @@ def create_app(test_config=None):
     from . import dispatcher
     app.register_blueprint(dispatcher.bp)
 
+    @app.route('/')
+    def hello():
+        return render_template('home.html', MSG=msg.MSG());
     # My: Registering Blog Blueprint
     # from . import blog
     # app.register_blueprint(blog.bp)

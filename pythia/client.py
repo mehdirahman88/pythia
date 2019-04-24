@@ -86,8 +86,8 @@ def home():
             '   WHERE client_id=?',
             (g.userid,)
         ).fetchall()
-    except:
-        pass
+    except sqlite3.Error as e:
+        return e.args[0]
     # active_id = [row['id'] for row in rows and row['due_date_time'] > cur_date_time]
     # past_id = [row['id'] for row in rows and row['due_date_time'] <= cur_date_time]
     # Note: Update and send active_id as dictionary, like in annotator module
@@ -115,8 +115,8 @@ def createnew():
                 '   WHERE "user_type" = ?',
                 ("Annotator",)
             ).fetchall()
-        except:
-            rows = []
+        except sqlite3.Error as e:
+            return e.args[0]
 
         rows = get_json_from_table(rows)
 
@@ -199,9 +199,9 @@ def createnew():
                     ("Uploaded", sample_size, project_id)
                 )
         except sqlite3.Error as e:
-            return "DB ERROR: " + e.args[0]
+            return e.args[0]
         except Exception as e:
-            return "Error While Writing To DB " + e.args[0]
+            return e.args[0]
 
         #return "good"
         flash("Created New Successfully.")

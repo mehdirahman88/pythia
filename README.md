@@ -1,15 +1,16 @@
-# README Pythia {ignore=true}
+# README Pythia
 
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 <!-- code_chunk_output -->
 
-* [Landing Words](#landing-words)
-* [Features](#features)
-* [Overview](#overview)
-* [Guideline](#guideline)
-* [Future Steps](#future-steps)
-* [Contributors](#contributors)
+* [README Pythia](#readme-pythia)
+	* [Landing Words](#landing-words)
+	* [Features](#features)
+	* [Overview](#overview)
+	* [Guideline](#guideline)
+	* [Future Steps](#future-steps)
+	* [Contributors](#contributors)
 
 <!-- /code_chunk_output -->
 
@@ -37,7 +38,7 @@
 	 - Please refer to: [Flask Quickstart](http://flask.pocoo.org/docs/1.0/quickstart/)
  - **Deployment**
 	 - The app currently uses the built-in flask server. You may dockerize the app as it is. Please refer to the given `Dockerfile`.
-	 - Further: [Deployment Options](flask.pocoo.org/docs/1.0/deploying/)
+	 - Further: [Deployment Options](http://flask.pocoo.org/docs/1.0/deploying/)
  - **Client**
      - Sign Up as Client
      - Create New Project
@@ -69,4 +70,5 @@
      - Faster Dispatcher
 ## Contributors
 Mehdi Rahman
+
 Ragib Ahsan

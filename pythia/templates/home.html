@@ -1,12 +1,12 @@
 {% extends 'base_auth.html' %}
 
-{% block title %}...{% endblock %}
+{% block title %}Home{% endblock %}
 
 
 {% block header %}
-<h1>Welcome To Pythia!</h1>
+    <h1>Welcome To Pythia!</h1>
 {% endblock %}
 
 {% block content %}
-    <p> Introductory Notes </p>
+    <p>{{MSG.home_intro() | safe}}</p>
 {% endblock %}

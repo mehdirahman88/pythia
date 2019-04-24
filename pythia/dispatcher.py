@@ -38,7 +38,7 @@ def get_data(project_id):
             # a = get_json_from_table(a)
             # return jsonify(a)
     except sqlite3.Error as e:
-        return e.args[0] +"ss"
+        return e.args[0]
 
     sz = len(rows)
     rows_final = rows

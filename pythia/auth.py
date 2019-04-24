@@ -26,14 +26,7 @@ def load_user():
         g.userid = userid
     if usertype is not None:
         g.usertype = usertype
-    # if '/client' in request.path:
-    #     g.user = "God_C"
-    #     g.userid = 1
-    # elif '/annotator' in request.path:
-    #     g.user = "God_A"
-    #     g.userid = 3
-    # else:
-    #     g.user = "Problematic User"
+    
 
 ### Used Accross Modules
 def login_required(view):

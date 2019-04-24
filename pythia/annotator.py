@@ -10,6 +10,7 @@ from pythia.auth import get_current_date_time, get_json_from_table, get_progress
 from pythia.db import get_db
 from pythia.dispatcher import get_data, push_data
 
+import sqlite3
 import functools
 
 # rom pythia.dispatcher import
@@ -33,16 +34,14 @@ def home():
     try:
         rows = rows
         rows = db.execute(
-            # 'SELECT contributors.user_id, projects.id, projects.due_date_time'
-            # 'SELECT contributors.user_id, contributors.project_id, projects.due_date_time'
             'SELECT contributors.project_id, projects.title'
             '   FROM contributors'
             '       INNER JOIN projects ON contributors.project_id = projects.id'
             '       WHERE contributors.user_id = ? AND projects.due_date_time > ?;',
             (g.userid, cur_date_time)
         ).fetchall()
-    except:
-        rows = []
+    except sqlite3.Error as e:
+        return e.args[0]
 
     rows = get_json_from_table(rows)
     # rows.append(g.userid)
@@ -62,7 +61,7 @@ def pre_actions(view):
                 '   WHERE "id" = ?;',(id,)
             ).fetchone()
         except sqlite3.Error as e:
-            return "While Fetching Project: " + e.args[0]
+            return e.args[0]
         if row == None:
             msg = "Weird! Project No. {} Not Found in DB".format(id)
             # return msg #Edit Here

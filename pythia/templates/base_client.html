@@ -1,5 +1,5 @@
 <!doctype html>
-<title>Pythia Client| {% block title %}{% endblock %}</title>
+<title>{% block title %}{% endblock %} | Pythia Client</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
   <h1>{% if g.username %}Hi {{g.username}}{% endif %}</h1>
