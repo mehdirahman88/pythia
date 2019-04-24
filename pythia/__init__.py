@@ -22,10 +22,10 @@ def create_app(test_config=None):
 
     # ensure the instance folder exists
     # My: Omitting this
-    # try:
-    #     os.makedirs(app.instance_path)
-    # except OSError:
-    #     pass
+    try:
+        os.makedirs(app.config['FILE_DIR_ABS'])
+    except OSError:
+        pass
 
     # a simple page that says hello
 
