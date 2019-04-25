@@ -21,7 +21,7 @@ WORKDIR /home
 #COPY $appwheelfile /home/$appwheelfile
 COPY $appname /home/$appname
 COPY requirements.txt /home/requirements.txt
-COPY Files /home/Files
+COPY files /home/files
 
 # Install our app
 # RUN pip install flask
@@ -30,5 +30,6 @@ RUN pip install -r requirements.txt
 
 #########################################################
 # Specify the command to run when the image is run.
-CMD ["flask","run","--host","0.0.0.0", "--port", "5000"]
+# CMD ["flask","run","--host","0.0.0.0", "--port", "5000"]
+CMD ["python3","._serve_waitress.py"]
 #########################################################
