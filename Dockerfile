@@ -22,6 +22,10 @@ WORKDIR /home
 COPY $appname /home/$appname
 COPY requirements.txt /home/requirements.txt
 COPY files /home/files
+COPY ._serve_flask_dev.py /home/._serve_flask_dev.py
+COPY ._serve_flask_prod.py /home/._serve_flask_prod.py
+COPY ._serve_waitress.py /home/._serve_waitress.py
+COPY ._serve_gunicorn.py /home/._serve_gunicorn.py
 
 # Install our app
 # RUN pip install flask

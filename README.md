@@ -17,6 +17,8 @@
 ## Landing Words
  **Pythia** is a web application primarily developed as an initiative for helping researchers to build _Labeled Dataset_ from crowd in a organized way, with minimal effort, and yet with reliability.
 
+ It is running in GCP for demonstration: [Link](http://35.222.75.72:5000/)
+
 ## Features
  - Text to text labeling
  - Allow multiple annotators for simultaneous Annotation
