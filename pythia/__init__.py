@@ -11,6 +11,8 @@ def create_app(test_config=None):
         FILE_DIR_ABS=os.path.join(app.root_path, '../files/'),
         DATABASE='./files/'+'pythia.sqlite', #os.path.join(app.instance_path, 'testappdb1.sqlite'),
         DEBUG_VIEWS = False,
+        MAX_DISPATCH = 5,
+        MAX_ANNOTATOR = 10,
     )
 
     if test_config is None:
@@ -21,20 +23,16 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     # ensure the instance folder exists
-    # My: Omitting this
     try:
         os.makedirs(app.config['FILE_DIR_ABS'])
     except OSError:
         pass
 
-    # a simple page that says hello
-
-
-    # My: Initiating DB
+    # Note: Initiating DB
     from . import db
     db.init_app(app)
 
-    # My; Registering Auth Blueprint
+    # Note: Registering To Blueprints
     from . import auth
     app.register_blueprint(auth.bp)
 
@@ -53,13 +51,13 @@ def create_app(test_config=None):
     from . import dispatcher
     app.register_blueprint(dispatcher.bp)
 
+    from . import testing
+    app.register_blueprint(testing.bp)
+
+    # Note: Fix the root path
     @app.route('/')
     def hello():
         return render_template('home.html', MSG=msg.MSG());
-    # My: Registering Blog Blueprint
-    # from . import blog
-    # app.register_blueprint(blog.bp)
-
     # app.add_url_rule('/', endpoint='index')
 
     return app

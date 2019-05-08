@@ -5,16 +5,15 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import jsonify
 from flask import current_app as app
-import sqlite3
-import csv
+from flask import send_from_directory
 
 from pythia.auth import login_required
 from pythia.auth import login_auth_required
-from pythia.auth import get_table_size, get_current_date_time, get_progress
+from pythia.utilsmy import get_table_size, get_current_date_time, get_progress, get_json_from_table
 from pythia.db import get_db
-from pythia.auth import get_json_from_table
 
-from flask import send_from_directory
+import sqlite3
+import csv
 import os
 
 bp = Blueprint('client', __name__, url_prefix='/client')
@@ -32,7 +31,7 @@ def ret_project_csv(id):
                 (id,)
             ).fetchall()
     except sqlite3.Error as e:
-        return e.args[0]
+        return "Error(1): " + str(e.args[0])
     rows = get_json_from_table(rows)
 
     filename = "{}{}".format(id,"_labeled.csv")
@@ -48,8 +47,7 @@ def ret_project_csv(id):
                 writer.writerow(row)
         return send_from_directory(directory=filedir,filename=filename, as_attachment=True)
     except:
-        return "Unknown Error: Exporting .csv"
-
+        return "Error(2) Unknown: Exporting .csv"
 
 @bp.route('project/json/<int:id>', methods=['GET','POST'])
 def ret_project_json(id):
@@ -63,12 +61,12 @@ def ret_project_json(id):
                 (id,)
             ).fetchall()
     except sqlite3.Error as e:
-        return e.args[0]
+        return "Error(1): " + str(e.args[0])
     rows = get_json_from_table(rows)
     return jsonify(rows)
 
 @bp.route('/dashboard', methods=('GET', 'POST'))
-@login_required
+@login_auth_required
 def dashboard():
     return render_template('client/dashboard.html')
 
@@ -87,7 +85,7 @@ def home():
             (g.userid,)
         ).fetchall()
     except sqlite3.Error as e:
-        return e.args[0]
+        return "Error(1): " + str(e.args[0])
 
     for row in rows:
         if row['due_date_time'] > cur_date_time:
@@ -98,7 +96,7 @@ def home():
     return render_template('client/home.html', active_id = active_id, past_id = past_id)
 
 @bp.route('/createnew', methods=('GET', 'POST'))
-@login_required
+@login_auth_required
 def createnew():
     db = get_db()
 
@@ -112,7 +110,7 @@ def createnew():
                 ("Annotator",)
             ).fetchall()
         except sqlite3.Error as e:
-            return e.args[0]
+            return "Error(1): " + str(e.args[0])
 
         rows = get_json_from_table(rows)
 
@@ -120,74 +118,93 @@ def createnew():
             annotator_info_list = []
         else:
             annotator_info_list = rows
+        # return jsonify(annotator_info_list)
 
-        #return jsonify(annotator_info_list)
-
-        return render_template('client/createnew.html', annotator_info_list = annotator_info_list, max_annotator = 10)
+        return render_template('client/createnew.html', \
+        annotator_info_list = annotator_info_list, max_annotator = app.config['MAX_ANNOTATOR'])
 
     if request.method == 'POST':
 
-        # Converting from from request object to dictionary
+        ## Converting from from request object to dictionary
         myform = {}
         for x in request.form:
             myform[x] = request.form.getlist(x)
-
-        #return jsonify(type(myform['annotator_id_list'][0]) is int)
+        # return jsonify(type(myform['annotator_id_list'][0]) is int)
 
         annotator_count = len(myform['annotator_id_list'])
-        # After the successful insertion of a new project,
-        # this should be our project_id for other two tables
-        project_id = get_table_size("projects") + 1
 
-        # Build query list for contributors
+        ## project_id: after successful insertion in projects
+        #this should be latest project_id applicable for other tables
+        ## project_id = get_table_size("projects") + 1 (wrong: db doesn't ensure
+        #sequential increament of primary key)
+        row = {}
+        try:
+            with db:
+                row = db.execute(
+                    'SELECT "seq" FROM "sqlite_sequence"'
+                    '   WHERE "name" = ?;',
+                    ("projects",)
+                ).fetchone()
+        except sqlite3.Error as e:
+            return "Error(2) while reading sqlite_sequence: " + str(e.args[0])
+        project_id = 1
+        if row is not None:
+            project_id = int(row['seq']) + 1
+
+        ## Build query list for contributors
         contributor_query_list = []
         contributor_query_list.append((g.userid, project_id))
         for annotator in myform['annotator_id_list']:
             contributor_query_list.append((int(annotator), project_id))
+        # return "{}{}".format((type(contributor_query_list[0][0]) is int), contributor_query_list)
 
-        #return "{}{}".format((type(contributor_query_list[0][0]) is int), contributor_query_list)
+        ## File Processing + Query Building for contents
+        try:
+            file = request.files['samplefile']
+            file.filename = "{}{}".format(project_id,".csv")
+            file.save(app.config['FILE_DIR_ABS']+file.filename)
+        except Exception as e:
+            return "Error(3) while reading or saving file: " + str(e.args[0])
 
-        # File Processing + Query Building for contents
-        file = request.files['samplefile']
-        file.filename = "{}{}".format(project_id,".csv")
-        # file.save('./Files/'+file.filename)
-        file.save(app.config['FILE_DIR']+file.filename)
-
-        # Build query list for contents
+        ## Build query list for contents
         content_query_list = []
         try:
-            with open(app.config['FILE_DIR']+file.filename) as f:
+            with open(app.config['FILE_DIR_ABS']+file.filename) as f:
                 reader = csv.DictReader(f)
                 for row in reader:
                     content_query_list.append((project_id, row['Sample']))
         except Exception as e:
-            return "Error While Reading File(csv): " + e.args[0]
+            return "Error(4) while reading File(csv): " + str(e.args[0])
 
         sample_size = len(content_query_list)
 
         try:
             with db:
-                # Save To Table: projects
+                ## Save To Table: projects
+                #Note: db AUTOINCREMENT doesn't ensure consecutity primary key
+                #but we need the latest primary key for other tables
+                #hence, passing the id parameter
                 db.execute(
-                    'INSERT INTO "projects" (client_id, title, description, due_date_time, \
+                    'INSERT INTO "projects" (id, client_id, title, description, due_date_time, \
                     label_count, label_list, annotator_count, annotator_id_list)'
-                    '   VALUES (?, ?, ?, ?, ?, ?, ?, ?);',
-                    (g.userid, myform['title'][0], myform['description'][0], myform['due_date'][0] + " 23:59:59", \
+                    '   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);',
+                    (project_id, g.userid, myform['title'][0], myform['description'][0], myform['due_date'][0] + " 23:59:59", \
                     myform['label_count'][0], myform['label_list'][0], annotator_count, ' '.join(myform['annotator_id_list']))
                 )
-                # Save To Table: contributors (To Do: Push Annotators (done))
+                ## Save To Table: contributors
                 db.executemany(
                     'INSERT INTO "contributors" ("user_id", "project_id")'
                     '   VALUES (?, ?);',
                     contributor_query_list
                 )
-                # Save To Table: contents : status by default "Not Annotated"
+                ## Save To Table: contents
+                #Note: status by default "Not Annotated"
                 db.executemany(
                     'INSERT INTO contents (project_id, content_element)'
                     '   VALUES (?, ?);',
                     content_query_list # Edit for full list insert
                 )
-                # Note: Add Status Update In "projects"
+                ## Updating "projects" status after successful insertions
                 db.execute(
                     'UPDATE "projects"'
                     '   SET "status"=?, "sample_size"=?'
@@ -195,22 +212,18 @@ def createnew():
                     ("Uploaded", sample_size, project_id)
                 )
         except sqlite3.Error as e:
-            return e.args[0]
+            return "Error(5): " + str(e.args[0])
         except Exception as e:
-            return e.args[0]
+            return "Error(6): " + str(e.args[0])
+        # return "good"
 
-        #return "good"
         flash("Created New Successfully.")
         return redirect(url_for('client.home'))
-
-
 
 @bp.route('/project/<int:id>', methods=('GET', 'POST'))
 @login_auth_required
 def project(id):
-
-    # return jsonify(get_progress(id)) # test
-    # Common Repetitive Tasks
+    ## Common Repetitive Tasks
     db = get_db()
     row = {}
     try:
@@ -219,14 +232,15 @@ def project(id):
             '   WHERE "id" = ?;',(id,)
         ).fetchone()
     except sqlite3.Error as e:
-        return "While Fetching Project: " + e.args[0]
+        return "Error(1) while Fetching Project: " + str(e.args[0])
     if row == None:
         msg = "Weird! Project No. {} Not Found in DB".format(id)
         # flash("Weird! Project No. {} Not Found in DB".format(id))
         return render_template('client/project.html', project_id = id, info=None, msg = msg)
-    # END Common Repetitive Taskss
+    ## END Common Repetitive Taskss
 
     if request.method == 'POST':
+        ## Check if the request came from forms
         if request.form['button'] == 'secret':
             status = row['status']
             if status == "Not Uploaded":
@@ -247,7 +261,7 @@ def project(id):
                         flash("Project Started.")
                         return redirect(url_for("client.project", id = id))
                 except sqlite3.Error as e:
-                    return e.args[0]
+                    return "Error(2): " + str(e.args[0])
             else:
                 flash("No Action.")
                 return redirect(url_for("client.project", id = id))
@@ -264,7 +278,7 @@ def project(id):
                     flash('Project Stopped.')
                     return redirect(url_for("client.project", id = id))
                 except sqlite3.Error as e:
-                    return e.args[0]
+                    return "Error(3): " + str(e.args[0])
             else:
                 flash('No Actions')
                 return redirect(url_for("client.project", id = id))
@@ -293,10 +307,10 @@ def project(id):
                         '   WHERE "id"=?;',(status1, id)
                     )
             except sqlite3.Error as e:
-                return e.args[0]
-        # status might get updated,
-        # so saving one query for row = updated fetch,
-        # passing the variable status1 specially
+                return "Error(4): " + str(e.args[0])
+        ## status might get updated,
+        #so saving one query for row = updated fetch,
+        #passing the variable status1 specially
         flash("Project Status: " + status1)
         return render_template('client/project.html', project_id = row['id'], info=row, \
         status = status1, progress=progress, msg = None)

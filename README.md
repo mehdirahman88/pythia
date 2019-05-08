@@ -71,8 +71,8 @@
      - Annotator ranking
      - Faster Dispatcher
 ## Contributors
-Mehdi Rahman
+Mehdi Rahman (Design and Development)
 
-Ragib Ahsan
+Ragib Ahsan (Advisor)
 
 Special Thanks: Md. Kawser Munshi

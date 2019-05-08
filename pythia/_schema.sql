@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS projects;
 DROP TABLE IF EXISTS contents;
 DROP TABLE IF EXISTS users;
--- DROP TABLE IF EXISTS annotator;
 DROP TABLE IF EXISTS contributors;
 
 
