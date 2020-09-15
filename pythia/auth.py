@@ -1,14 +1,14 @@
+import functools
+
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
-
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import jsonify
 from flask import current_app as app
 
 from pythia.db import get_db, init_db
 
-import functools
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -28,7 +28,8 @@ def load_user():
     if usertype is not None:
         g.usertype = usertype
 
-## Used Accross Modules
+
+# Decorator
 def login_required(view):
     @functools.wraps(view)
     def wrapped_view(*nargs, **kwargs):
@@ -37,7 +38,8 @@ def login_required(view):
         return view(*nargs, **kwargs)
     return wrapped_view
 
-## Implement This With + Without parameter *
+
+# Implement This With + Without parameter *
 def login_auth_required(view):
     @functools.wraps(view)
     def wrapped_view(*nargs, **kwargs):
@@ -85,7 +87,7 @@ def login_auth_required(view):
     return wrapped_view
 
 
-## Routes of Auth Module
+# Routes of Auth Module
 @bp.route('/signup', methods=('GET', 'POST'))
 def signup():
     if request.method == 'POST':
@@ -122,6 +124,7 @@ def signup():
         flash(msg)
     return render_template('auth/signup.html')
 
+
 @bp.route('/signout')
 def signout():
     session.clear();
@@ -130,6 +133,7 @@ def signout():
     g.pop('usertype', None)
     flash("Successfully Signed Out")
     return redirect(url_for('hello'))
+
 
 @bp.route('/signin', methods=('GET', 'POST'))
 def signin():

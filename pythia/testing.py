@@ -1,7 +1,10 @@
+import os
+import sqlite3
+import csv
+
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
-
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import jsonify
 from flask import current_app as app
@@ -12,45 +15,25 @@ from pythia.auth import login_auth_required
 from pythia.utilsmy import get_table_size, get_current_date_time, get_progress, get_json_from_table
 from pythia.db import get_db, init_db
 
-import sqlite3
-import csv
-import os
 
 bp = Blueprint('testing', __name__, url_prefix='/testing')
 
 
-# Some Routes for testing
+# Some Routes for RAW testing
+#############################
+
+
 @bp.route('/test', methods=('GET', 'POST'))
 def test():
+    return jsonify("hello");
 
-    return jsonify(generate_password_hash("123456"))
-
-    import sqlite3
-    init_db()
-
-    db = get_db()
-
-    xx=[]
-    x = db.execute("SELECT datetime('now')").fetchone()
-    xx.append(x[0])
-    import time;
-    time.sleep(3)
-    x = db.execute('SELECT datetime("now")').fetchone()
-    xx.append(x[0])
-    # x = db.execute(
-    #     "SELECT date('now')"
-    # ).fetchall()
-    xx.append(xx[0] < xx[1])
-    xx.append(xx[0] > xx[1])
-
-    return jsonify(xx)
-    return render_template('auth/signin.html')
 
 @bp.route('/db/clear')
 def db_clear():
     init_db()
     flash("DB Initialized")
     return redirect(url_for('hello'))
+
 
 @bp.route('db/show/all')
 def db_show_user():
@@ -59,6 +42,7 @@ def db_show_user():
     ROWS = []
     ROWS.append("Table: users")
     rows = {}
+
     try:
         with db:
             rows = db.execute(
@@ -66,12 +50,13 @@ def db_show_user():
             ).fetchall()
     except sqlite3.Error as e:
         return e.args[0]
+
     rows = get_json_from_table(rows)
     ROWS.append(rows)
 
-    
     return jsonify(ROWS)
-## Used during very eary stage of development
+
+
 @bp.route('/db/populate', methods=('GET', 'POST'))
 def populate_db():
     init_db()
@@ -274,15 +259,13 @@ def populate_db():
         '   VALUES (?, ?);',
         (5, sz_projects)
     )
-    # db.execute(
-    #     'INSERT INTO "contributors" ("user_id", "project_id")'
-    #     '   VALUES (?, ?);',
-    #     (3, sz_projects)
-    # )
 
     db.commit()
+
     flash("Succefully Populated: users, projects")
+
     return redirect(url_for('client.home'))
+
 
 def edit(x):
     if len(x) == 0:
@@ -296,6 +279,7 @@ def edit(x):
             resp[key] = row[key]
         resps.append(resp)
     return resps
+
 
 @bp.route('/db/show', methods=('GET', 'POST'))
 def show_db():
@@ -316,6 +300,7 @@ def show_db():
     table.append(edit(rows))
 
     return jsonify(table)
+
 
 @bp.route('/db/rollback', methods=('GET', 'POST'))
 def db_rollback():
