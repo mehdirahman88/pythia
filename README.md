@@ -1,78 +1,63 @@
-# README Pythia
+**Pythia** is a web application developed as an initiative for helping researchers to build labeled dataset
+with minimal effort by assigning annotators.
 
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-<!-- code_chunk_output -->
+#### Supports
+ - Text to text labeling.
+ - Multiple annotators for simultaneous annotation.
+ - Tracking project progress.
+ - Pause and resume ongoing project.
 
-* [README Pythia](#readme-pythia)
-	* [Landing Words](#landing-words)
-	* [Features](#features)
-	* [Overview](#overview)
-	* [Guideline](#guideline)
-	* [Future Steps](#future-steps)
-	* [Contributors](#contributors)
 
-<!-- /code_chunk_output -->
+#### Overview
+ **Pythia** is easy to use. You have to:
+  - Upload your sample data file of size up to 50 Mb and list of labels in a specified format.
+  - Assign up to 10 annotators and run the project.
 
-## Landing Words
- **Pythia** is a web application primarily developed as an initiative for helping researchers to build _Labeled Dataset_ from crowd in a organized way, with minimal effort, and yet with reliability.
+ When the project is ready for labeling:
+  - Annotators will receive 5 unlabeled data from _Pythia Dispatcher_ each time they request through the project page.
+	- Annotators will not receive data already annotated by them.
 
- It is running in GCP for demonstration: [Link](http://35.222.75.72:5000/)
 
-## Features
- - Text to text labeling
- - Allow multiple annotators for simultaneous Annotation
- - View project progress status
- - Pause and resume running project
-
-## Overview
- **Pythia** is very simple to use. You just upload your sample data file of size up to 50 Mb and list of labels in the format specified, then assign up to 10 annotators and run the project.
-
- Annotators will find 5 unlabeled data from _Pythia Dispatcher_ each time they hit the project page ready for labeling. **Dispatcher** will receive those annotated data and assign new set of data to the Annotator. No Annotator will receive already annotated data.
-<!-- ### What It Is? -->
-<!-- ### How It Works? -->
-<!-- ## Tutorial -->
-## Guideline
+#### Setup
  - **Running Server and Database Setup**
 	 - `export FLASK_APP=pythia`
 	 - `flask init-db`
 	 - `flask run --host 0.0.0.0 --port 5000`
-	 - Please refer to: [Flask Quickstart](http://flask.pocoo.org/docs/1.0/quickstart/)
+	 - [Flask Quickstart](http://flask.pocoo.org/docs/1.0/quickstart/)
  - **Deployment**
-	 - The app currently uses the built-in flask server. You may dockerize the app as it is. Please refer to the given `Dockerfile`.
-	 - Further: [Deployment Options](http://flask.pocoo.org/docs/1.0/deploying/)
+	 - The app currently uses the built-in flask server.
+	 - You may refer to the given `Dockerfile` if you want to dockerize.
+	 - [Deployment Options](http://flask.pocoo.org/docs/1.0/deploying/)
+
+
+#### Usage
  - **Client**
-     - Sign Up as Client
-     - Create New Project
-         - File size has to be less than 50Mb
-         - File format has to be .csv
-         - File should contain one column named 'Sample' and a single sample data per row.
+     - Sign up as Client
+     - Create new project
+         - File size has to be less than 50Mb.
+         - File format has to be .csv.
+         - File should contain one column named 'Sample', and a single sample data per row.
      - Start Project
  - **Annotator**
-     - Sign Up as Annotator
+     - Sign up as Annotator
      - View running project list in the home page
-         - Click on the link
-         - Label the samples
-         - Submit, then the page will refresh with new data
+         - Click on the link.
+         - Label the samples.
+         - Submit, then the page will refresh with new data.
 
-## Future Steps
- - **Next Steps**:
-     - Multi-label Annotation
-     - View progress status in more details:
-         - Annotator progress
-         - Annotation speed curve.
-     - Project management feature:
-         - Add annotator in a running project
-         - Extend project after time out
-         - Message broadcast to annotators.
- - **Next Next Steps**:
-     - Active learning
-     - Administrative dashboard
-     - Annotator ranking
-     - Faster Dispatcher
-## Contributors
-Mehdi Rahman (Design and Development)
 
-Ragib Ahsan (Advisor)
-
-Special Thanks: Md. Kawser Munshi
+#### Further Steps
+ Possible next steps might be:
+  - Multi-label Annotation
+  - View progress status in more details
+  	- Annotation speed curve.
+    - Annotator's progress.
+  - Project management features
+	  - Add annotator in a running project
+	  - Extend project after time out
+	  - Message broadcast to annotators.
+  - Active learning
+  - Administrative dashboard
+  - Annotator ranking
+  - Faster Dispatcher
